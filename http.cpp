@@ -11,20 +11,24 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h> 
+#include "square.h"
+using namespace std;
+
 #define DEST_PORT 80
-#define DEST_IP_ADDR "119.29.15.186"
 #define DEST_IP_BY_NAME "dm.trtos.com"
 
 
-void process_info(int fd) {
+string http_get(int fd,string text) {
 int send_num;
     char send_buf [] = "helloworld";
     char recv_buf [4096];
     char str1[4096];
+    string res;
     while (1) {
         printf("begin send\n");
         memset(str1,0,4096);
-        strcat(str1, "POST http://dm.trtos.com/php/value.php?name=servertool_key HTTP/1.1\r\n");
+        //strcat(str1, "POST http://dm.trtos.com/php/value.php?name=servertool_key HTTP/1.1\r\n");
+        strcat(str1, text.c_str());
         strcat(str1,"Host: dm.trtos.com\r\n");
         strcat(str1,"Content-Length: 65\r\n");
         strcat(str1,"Content-Type: application/x-www-form-urlencoded\r\n");
@@ -45,14 +49,16 @@ int send_num;
                 exit(1);
             } else {
                 printf("recv sucess:%s\n",recv_buf);
+                res=recv_buf;
             }
         }
         break;
         sleep(5);
     }
+    return res;
 }
 
-int http()
+int connect()
 {
     int sock_fd;
     struct sockaddr_in addr_serv;
@@ -70,13 +76,11 @@ int http()
     struct hostent* hostInfo = gethostbyname(DEST_IP_BY_NAME);
     if(NULL == hostInfo){
         std::cout << "hostInfo is null\n" << std::endl;
-        return -6;
+        exit(1);
     }
     memset(&addr_serv, 0, sizeof(addr_serv));
     addr_serv.sin_family = AF_INET;
     addr_serv.sin_port = htons(DEST_PORT);
-    //addr_serv.sin_addr.s_addr = inet_addr(DEST_IP_ADDR);
-
     printf("Ip address = %s \n",inet_ntoa(*((struct in_addr*)hostInfo->h_addr)));
     memcpy(&addr_serv.sin_addr, &(*hostInfo->h_addr_list[0]), hostInfo->h_length);
 
@@ -89,6 +93,20 @@ int http()
     {
         printf("connect successful\n");
     }
-    process_info(sock_fd);
+    return sock_fd;
+}
+int http()
+{
+    int sock_fd;
+    string get="POST http://dm.trtos.com/php/value.php?name=servertool_key HTTP/1.1\r\n";
+    string set="POST http://dm.trtos.com/php/value.php?name=servertool_key&value=454545 HTTP/1.1\r\n";
+    string set_mac="POST http://dm.trtos.com/php/value.php?name=servertool_mac&value=55:34:33:33:33 HTTP/1.1\r\n";
+    sock_fd=connect();
+    string r=http_get(sock_fd,get);
+    std::cout << r << std::endl;
+
+    r=http_get(sock_fd,set_mac);
+    std::cout << r << std::endl;
+    encryption("sds");
     return 0;
 }
