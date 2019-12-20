@@ -16,13 +16,13 @@
 using namespace std;
 #include "appconfig.h"
 #include "http.h"
-
+#include "shell.h"
 
 #define DEST_PORT 80
 #define DEST_IP_BY_NAME "dm.trtos.com"
 string ap_serverip;
 string ap_serverurl;
-int ap_sock_fd;
+string ap_mac;
 bool ap_debug;
 
 
@@ -45,7 +45,7 @@ string appgetipbyname(string name)
     if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)printf("ERROR: getaddrinfo error: %s\n", gai_strerror(err));
     for(aip = ai; aip != NULL; aip = aip->ai_next)
     {
-        printf("Canonical Name: %s\n", aip->ai_canonname);
+        if(ap_debug)printf("Canonical Name: %s\n", aip->ai_canonname);
         if(aip->ai_family == AF_INET)
         {
             sinp = (struct sockaddr_in *)aip->ai_addr;
@@ -57,16 +57,18 @@ string appgetipbyname(string name)
     return 0;
 }
 
+//配置参数
 int appconfig( int argc, char **argv )
 {
     ap_debug=false;
     for(int i=0;i<argc;i++)
     {
-        if(strcmp(argv[i],"debug"))ap_debug=true;
+        if(strcmp(argv[i],"debug")==0)ap_debug=true;
     }
     ap_serverurl=DEST_IP_BY_NAME;
     ap_serverip=appgetipbyname(ap_serverurl);
-    ap_sock_fd=connect_ip(ap_serverip);
-
+    ap_mac=getmac();
+    cout <<"local eth0 address:"<< ap_mac << endl;
+    http_sendmac();
     return 0;
 }

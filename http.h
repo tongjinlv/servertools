@@ -3,6 +3,6 @@
 
 int connect_ip(string ip);
 int http(void);
-
+void http_sendmac(void);
 #endif
 

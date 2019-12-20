@@ -18,7 +18,7 @@ using namespace std;
 
 double square( double x );
 
-string encryption(string text);
-string decryption(string text);
+string encryption(string str);
+string decryption(string str);
 
 #endif

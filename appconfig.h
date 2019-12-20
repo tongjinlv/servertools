@@ -17,7 +17,9 @@
 using namespace std;
 extern string ap_serverip;
 extern string ap_serverurl;
-extern int ap_sock_fd;
+extern string ap_mac;
+extern bool ap_debug;
+
 int appconfig( int argc, char **argv);
 
 #endif

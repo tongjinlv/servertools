@@ -17,6 +17,7 @@
 #include <netdb.h> 
 using namespace std;
 #include "square.h"
+#include "appconfig.h"
 
 double square( double x )
 {
@@ -32,7 +33,7 @@ std::string binToHex(const unsigned char *data,size_t size)
 	return strHex.str();
 }
  
-std::vector<unsigned char> hexToBin(std::string hex)
+std::vector<unsigned char> hexToBin(const std::string hex)
 {
 	std::vector<unsigned char> dest;
 	int len = hex.size();
@@ -46,19 +47,26 @@ std::vector<unsigned char> hexToBin(std::string hex)
 	}
 	return dest;
 }
-string encryption(string text)
+string encryption(string str)
 {
     string temp;
-     char *strTest = "ceD2CAC7B8F6B4F3D0DCC3A8";
+    const char *strTest =str.c_str();
 	std::vector<unsigned char> charVec=hexToBin(strTest);
-    charVec[0]=12;
-    for(int i=0;i<charVec.size();i++)printf("%d ",charVec[i]);
+	string mac=ap_mac;
+	for(int i=0;i<mac.size();i++)if(mac[i]==':')mac[i]='_';
+	if(ap_debug)cout << mac<<mac.size()<< endl;
+    for(int i=0;i<charVec.size();i++)
+	{
+
+		charVec[i]=charVec[i]^mac[i%17];
+	}
 	std::cout << std::endl;
-	string strHex = binToHex(charVec.data(), charVec.size());
-	std::cout << strHex << std::endl;
-    return temp;
+	std::string str2( charVec.begin(), charVec.end());
+	if(ap_debug)cout << str2<< endl;
+	//string strHex = binToHex(charVec.data(), charVec.size());
+    return str2;
 } 
-string decryption(string text)
+string decryption(string str)
 {
     string temp;
     return temp;
