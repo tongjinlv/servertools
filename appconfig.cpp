@@ -23,6 +23,7 @@ using namespace std;
 string ap_serverip;
 string ap_serverurl;
 int ap_sock_fd;
+bool ap_debug;
 
 
 string appgetipbyname(string name)
@@ -58,8 +59,14 @@ string appgetipbyname(string name)
 
 int appconfig( int argc, char **argv )
 {
+    ap_debug=false;
+    for(int i=0;i<argc;i++)
+    {
+        if(strcmp(argv[i],"debug"))ap_debug=true;
+    }
     ap_serverurl=DEST_IP_BY_NAME;
     ap_serverip=appgetipbyname(ap_serverurl);
     ap_sock_fd=connect_ip(ap_serverip);
+
     return 0;
 }
