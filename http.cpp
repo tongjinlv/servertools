@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <netdb.h> 
 #include "square.h"
+#include "appconfig.h"
 using namespace std;
 
 #define DEST_PORT 80
@@ -57,37 +58,8 @@ int send_num;
     }
     return res;
 }
-string mygetaddrinfo()
-{
-    struct addrinfo *ai, *aip;
-    struct addrinfo hint;
-    struct sockaddr_in *sinp;
-    const char *addr;
-    int err;
-    char buf[1024];
-    hint.ai_flags = AI_CANONNAME;
-    hint.ai_family = 0;
-    hint.ai_socktype = 0;
-    hint.ai_protocol = 0;
-    hint.ai_addrlen = 0;
-    hint.ai_canonname = NULL;
-    hint.ai_addr = NULL;
-    hint.ai_next = NULL;
-    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)printf("ERROR: getaddrinfo error: %s\n", gai_strerror(err));
-    for(aip = ai; aip != NULL; aip = aip->ai_next)
-    {
-        printf("Canonical Name: %s\n", aip->ai_canonname);
-        if(aip->ai_family == AF_INET)
-        {
-            sinp = (struct sockaddr_in *)aip->ai_addr;
-            addr = inet_ntop(AF_INET, &sinp->sin_addr, buf, sizeof buf);
-            return addr;
-        }
-        printf("\n");
-    }
-    return 0;
-}
-int connect()
+
+int connect_ip(string ip)
 {
     int sock_fd;
     struct sockaddr_in addr_serv;
@@ -100,9 +72,8 @@ int connect()
     memset(&addr_serv, 0, sizeof(addr_serv));
     addr_serv.sin_family = AF_INET;
     addr_serv.sin_port = htons(DEST_PORT);
-    string mac=mygetaddrinfo();
-    printf("Ip address=%s",mac.c_str());
-    in_addr_t addr=inet_addr(mac.c_str());
+    printf("Ip address=%s",ip.c_str());
+    in_addr_t addr=inet_addr(ip.c_str());
     memcpy(&addr_serv.sin_addr, &(addr), sizeof(addr));
     if (connect(sock_fd, (struct sockaddr*)(&addr_serv), sizeof(addr_serv)) < 0)
     {
@@ -117,10 +88,9 @@ int http()
     string get="POST http://dm.trtos.com/php/value.php?name=servertool_key HTTP/1.1\r\n";
     string set="POST http://dm.trtos.com/php/value.php?name=servertool_key&value=454545 HTTP/1.1\r\n";
     string set_mac="POST http://dm.trtos.com/php/value.php?name=servertool_mac&value=55:34:33:33:33 HTTP/1.1\r\n";
-    sock_fd=connect();
-    string r=http_get(sock_fd,get);
+    string r=http_get(ap_sock_fd,get);
     std::cout << r << std::endl;
-    r=http_get(sock_fd,set_mac);
+    r=http_get(ap_sock_fd,set_mac);
     std::cout << r << std::endl;
     encryption("sds");
     return 0;
