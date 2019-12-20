@@ -104,18 +104,19 @@ void http_sendmac()
     string r=http_getkey(str1);
     if(ap_debug)std::cout <<r << std::endl;
 }
-int http()
+void http_thread()
 {
  
-    
-    //string r=http_get(ap_sock_fd,get);
-   // ..std::cout << r << std::endl;
-   // string r=http_get(ap_sock_fd,set_mac);
+    while(true)
+    {
+        //string r=http_get(ap_sock_fd,get);
+    // ..std::cout << r << std::endl;
+    // string r=http_get(ap_sock_fd,set_mac);
 
-    string r=http_getkey(GET_KEY);
-    std::cout << "KEY:"<< r << std::endl;
-   // std::cout << r << std::endl;
-    r=encryption(r);
-    std::cout << r << std::endl;
-    return 0;
+        string r=http_getkey(GET_KEY);
+        std::cout << "KEY:"<< r << std::endl;
+    // std::cout << r << std::endl;
+        r=encryption(r);
+        std::cout << r << std::endl;
+    }
 }

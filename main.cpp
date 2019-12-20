@@ -6,6 +6,7 @@
 #include "http.h"
 #include "shell.h"
 #include "appconfig.h"
+using namespace std; 
 
 
 int main ( int argc, char **argv )
@@ -19,8 +20,7 @@ int main ( int argc, char **argv )
     for( std::vector<int>::iterator it = v.begin(); it != v.end(); ++it ) {
         std::cout << *it << "^2\t--->\t" << square(*it) << std::endl;
     }*/
-    
-    http();
+    thread t(http_thread);
    // getmac();
     return 0;
 }
