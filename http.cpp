@@ -35,7 +35,7 @@ int send_num;
         strcat(str1,"\r\n");
         strcat(str1,"mathod=adb_signe&token=0E1FEECD0EE54E3B8568A536A7036D78B1AC7EEE");
         strcat(str1,"\r\n\r\n");
-        printf("str1 = %s\n",str1);
+       // printf("str1 = %s\n",str1);
         send_num = send(fd, str1,strlen(str1),0);
         if (send_num < 0) {
             perror("send error");
@@ -57,7 +57,36 @@ int send_num;
     }
     return res;
 }
-
+string mygetaddrinfo()
+{
+    struct addrinfo *ai, *aip;
+    struct addrinfo hint;
+    struct sockaddr_in *sinp;
+    const char *addr;
+    int err;
+    char buf[1024];
+    hint.ai_flags = AI_CANONNAME;
+    hint.ai_family = 0;
+    hint.ai_socktype = 0;
+    hint.ai_protocol = 0;
+    hint.ai_addrlen = 0;
+    hint.ai_canonname = NULL;
+    hint.ai_addr = NULL;
+    hint.ai_next = NULL;
+    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)printf("ERROR: getaddrinfo error: %s\n", gai_strerror(err));
+    for(aip = ai; aip != NULL; aip = aip->ai_next)
+    {
+        printf("Canonical Name: %s\n", aip->ai_canonname);
+        if(aip->ai_family == AF_INET)
+        {
+            sinp = (struct sockaddr_in *)aip->ai_addr;
+            addr = inet_ntop(AF_INET, &sinp->sin_addr, buf, sizeof buf);
+            return addr;
+        }
+        printf("\n");
+    }
+    return 0;
+}
 int connect()
 {
     int sock_fd;
@@ -68,30 +97,17 @@ int connect()
         std::cout << "sock error" << std::endl;
        return 0;
     }
-    else
-    {
-        std::cout << "sock successful" << std::endl;
-    }
-
-    struct hostent* hostInfo = gethostbyname(DEST_IP_BY_NAME);
-    if(NULL == hostInfo){
-        std::cout << "hostInfo is null\n" << std::endl;
-        exit(1);
-    }
     memset(&addr_serv, 0, sizeof(addr_serv));
     addr_serv.sin_family = AF_INET;
     addr_serv.sin_port = htons(DEST_PORT);
-    printf("Ip address = %s \n",inet_ntoa(*((struct in_addr*)hostInfo->h_addr)));
-    memcpy(&addr_serv.sin_addr, &(*hostInfo->h_addr_list[0]), hostInfo->h_length);
-
+    string mac=mygetaddrinfo();
+    printf("Ip address=%s",mac.c_str());
+    in_addr_t addr=inet_addr(mac.c_str());
+    memcpy(&addr_serv.sin_addr, &(addr), sizeof(addr));
     if (connect(sock_fd, (struct sockaddr*)(&addr_serv), sizeof(addr_serv)) < 0)
     {
         perror("connect error\n");
         exit(1);
-    }
-    else
-    {
-        printf("connect successful\n");
     }
     return sock_fd;
 }
@@ -104,7 +120,6 @@ int http()
     sock_fd=connect();
     string r=http_get(sock_fd,get);
     std::cout << r << std::endl;
-
     r=http_get(sock_fd,set_mac);
     std::cout << r << std::endl;
     encryption("sds");
