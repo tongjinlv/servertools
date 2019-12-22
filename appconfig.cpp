@@ -17,6 +17,7 @@ using namespace std;
 #include "appconfig.h"
 #include "http.h"
 #include "shell.h"
+#include "log.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #define DEST_PORT 80
@@ -44,17 +45,16 @@ string appgetipbyname(string name)
     hint.ai_canonname = NULL;
     hint.ai_addr = NULL;
     hint.ai_next = NULL;
-    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)printf("ERROR: getaddrinfo error: %s\n", gai_strerror(err));
+    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)E("ERROR: getaddrinfo error: {}\n", gai_strerror(err));
     for(aip = ai; aip != NULL; aip = aip->ai_next)
     {
-        if(ap_debug)printf("Canonical Name: %s\n", aip->ai_canonname);
+        E("Canonical Name: {}\n", aip->ai_canonname);
         if(aip->ai_family == AF_INET)
         {
             sinp = (struct sockaddr_in *)aip->ai_addr;
             addr = inet_ntop(AF_INET, &sinp->sin_addr, buf, sizeof buf);
             return addr;
         }
-        printf("\n");
     }
     return 0;
 }
@@ -66,13 +66,15 @@ int appconfig( int argc, char **argv )
     for(int i=0;i<argc;i++)
     {
         if(strcmp(argv[i],"debug")==0)ap_debug=true;
+        if(strcmp(argv[i],"log")==0)LOG(stoi(argv[i+1]));
+        
         if(strcmp(argv[i],"--version")==0){printf("%s",SOFT_VERSION);exit(0);}
     }
-    spdlog::warn("The current software is only for internal use and cannot be used in illegal scenarios");
+    W("The current software is only for internal use and cannot be used in illegal scenarios");
     ap_serverurl=DEST_IP_BY_NAME;
     ap_serverip=appgetipbyname(ap_serverurl);
     ap_mac=getmac();
-    spdlog::info("local eth0 address:{}",ap_mac);
+    I("local eth0 address:{}",ap_mac);
     http_sendmac();
     return 0;
 }

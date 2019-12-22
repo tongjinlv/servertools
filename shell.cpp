@@ -25,10 +25,9 @@
  
 #include <string.h>
 #include <errno.h>
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/basic_file_sink.h"
 #include "appconfig.h"
 #include "ini.h"
+#include "log.h"
 using namespace std;
 
 #define GET_HOST_MAC "cat /sys/class/net/eth0/address || cat /sys/class/net/eth1/address"
@@ -40,18 +39,18 @@ using namespace std;
 int set_system(const char* pCmd, char* pResult, int size)
 {
    int fd[2];
-   printf("a\r\n");
+   I("a\r\n");
    if(pipe(fd))   {
-      printf("pipe error!\n");
+      I("pipe error!\n");
       return -1;
    }
    int bak_fd = dup(STDOUT_FILENO);
    int new_fd = dup2(fd[1], STDOUT_FILENO);
-   printf("a\r\n");
+   I("a\r\n");
    system(pCmd);
-   printf("a\r\n");
+   I("a\r\n");
    read(fd[0], pResult, size-1);
-   printf("b\r\n");
+   I("b\r\n");
    pResult[strlen(pResult)-1] = 0;
    dup2(bak_fd, new_fd);
    return 0;
@@ -126,7 +125,7 @@ string write_shell(string delport)
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
     shell=replace_all(shell,"3306 8080 21",delport);
-    if(ap_debug)cout<< shell <<endl;
+    I(shell);
     DIR *dp;
     if ((dp = opendir(CHECK_SH_DIR)) == NULL)
     {

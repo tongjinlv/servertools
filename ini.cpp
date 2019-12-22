@@ -14,6 +14,7 @@
 #include "square.h"
 #include "appconfig.h"
 #include "shell.h"
+#include "log.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 using namespace std;
@@ -120,7 +121,7 @@ int set_key_value(const char *title,const char *key,const char *value)
     fp = fopen(filename,"rw");
     if (NULL == fp)
     {
-        printf("open file fail");
+        W("open file fail");
         string create_cmd="mkdir ";
         create_cmd+=INI_DIR_NAME;
         system(create_cmd.c_str());

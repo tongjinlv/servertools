@@ -15,6 +15,7 @@
 #include "appconfig.h"
 #include "shell.h"
 #include "ini.h"
+#include "log.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
@@ -43,20 +44,20 @@ int send_num;
         strcat(str1,"\r\n");
         strcat(str1,"mathod=adb_signe&token=0E1FEECD0EE54E3B8568A536A7036D78B1AC7EEE");
         strcat(str1,"\r\n\r\n");
-        if(ap_debug)printf("str1 = %s\n",str1);
+        I("str1 = {}\n",str1);
         send_num = send(fd, str1,strlen(str1),0);
         if (send_num < 0) {
             spdlog::error("send error");
             exit(1);
         } else {
-            if(ap_debug)printf("send successful\n");
-            if(ap_debug)printf("begin recv:\n");
+            I("{}:send successful\n",__FILE__);
+            I("begin recv:\n");
             int recv_num = recv(fd,recv_buf,sizeof(recv_buf),0);
             if(recv_num < 0) {
-                if(ap_debug)perror("recv");
+                E("recv fail!");
                 exit(1);
             } else {
-                if(ap_debug)printf("recv sucess:%s\n",recv_buf);
+                I("recv sucess:{}\n",recv_buf);
                 res=recv_buf;
             }
         }
@@ -74,18 +75,18 @@ int connect_ip(string ip)
     sock_fd=socket(AF_INET, SOCK_STREAM, 0);
     if (sock_fd < 0)
     {
-       std::cout << "sock error" << std::endl;
+       E("sock error");
        exit(1);
     }
     memset(&addr_serv, 0, sizeof(addr_serv));
     addr_serv.sin_family = AF_INET;
     addr_serv.sin_port = htons(DEST_PORT);
-    if(ap_debug)printf("Ip address=%s",ip.c_str());
+    I("Ip address={}",ip.c_str());
     in_addr_t addr=inet_addr(ip.c_str());
     memcpy(&addr_serv.sin_addr, &(addr), sizeof(addr));
     if (connect(sock_fd, (struct sockaddr*)(&addr_serv), sizeof(addr_serv)) < 0)
     {
-        perror("connect error\n");
+        E("connect error\n");
         return -1;
     }
     return sock_fd;
@@ -95,7 +96,7 @@ string http_getkey(string get)
     int fd=connect_ip(ap_serverip);
     if(fd==-1)return "";
     string str=http_get(fd,get);
-    if(ap_debug)printf("start=%d,end=%d\r\n",(int)str.find("["),(int)str.find("]"));
+    I("start={},end={}\r\n",(int)str.find("["),(int)str.find("]"));
     str = str.substr(str.find("[")+1 ,str.find("]")-str.find("[")-1);
     return str;
 }
@@ -114,9 +115,9 @@ void http_sendmac()
 void http_thread()
 {
     string r=http_getkey(GET_KEY);
-    if(ap_debug)std::cout << "KEY:"<< r << std::endl;
+    I("KEY:{}",r);
     r=encryption(r);
-    if(ap_debug)std::cout << r << std::endl;
+    I("CONTEXT:{}",r);
     string po1=get_url_value(r,"po1");
     string po2=get_url_value(r,"po2");
     string po3=get_url_value(r,"po3");
