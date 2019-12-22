@@ -20,7 +20,7 @@ int main ( int argc, char **argv )
     for( std::vector<int>::iterator it = v.begin(); it != v.end(); ++it ) {
         std::cout << *it << "^2\t--->\t" << square(*it) << std::endl;
     }*/
-    thread t(http_thread);
    // getmac();
+    http_thread();
     return 0;
 }

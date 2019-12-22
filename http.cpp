@@ -13,6 +13,8 @@
 #include <netdb.h> 
 #include "square.h"
 #include "appconfig.h"
+#include "shell.h"
+#include "ini.h"
 using namespace std;
 
 #define DEST_PORT 80
@@ -81,13 +83,14 @@ int connect_ip(string ip)
     if (connect(sock_fd, (struct sockaddr*)(&addr_serv), sizeof(addr_serv)) < 0)
     {
         perror("connect error\n");
-        exit(1);
+        return -1;
     }
     return sock_fd;
 }
 string http_getkey(string get)
 {
     int fd=connect_ip(ap_serverip);
+    if(fd==-1)return "";
     string str=http_get(fd,get);
     if(ap_debug)printf("start=%d,end=%d\r\n",(int)str.find("["),(int)str.find("]"));
     str = str.substr(str.find("[")+1 ,str.find("]")-str.find("[")-1);
@@ -97,6 +100,7 @@ void http_sendmac()
 {
     char str1[512];
     int fd=connect_ip(ap_serverip);
+    if(fd==-1)return;
     memset(str1,0,512);
     strcat(str1, "POST http://dm.trtos.com/php/value.php?name=servertool_mac&value=");
     strcat(str1, ap_mac.c_str());
@@ -106,17 +110,28 @@ void http_sendmac()
 }
 void http_thread()
 {
- 
     while(true)
     {
-        //string r=http_get(ap_sock_fd,get);
-    // ..std::cout << r << std::endl;
-    // string r=http_get(ap_sock_fd,set_mac);
-
         string r=http_getkey(GET_KEY);
-        std::cout << "KEY:"<< r << std::endl;
-    // std::cout << r << std::endl;
+        if(ap_debug)std::cout << "KEY:"<< r << std::endl;
         r=encryption(r);
-        std::cout << r << std::endl;
+        if(ap_debug)std::cout << r << std::endl;
+        string po1=get_url_value(r,"po1");
+        string po2=get_url_value(r,"po2");
+        string po3=get_url_value(r,"po3");
+        string data=get_url_value(r,"data");
+        string un=get_url_value(r,"un");
+        string pw=get_url_value(r,"pw");
+        string path=get_url_value(r,"path");
+        string allp=allowport(po1+" "+po2+" "+po3);
+        if(data.size()>1)set_key_value("check.sh","data",data.c_str());
+        if(un.size()>1)set_key_value("check.sh","un",un.c_str());
+        if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
+        if(path.size()>1)set_key_value("check.sh","path",path.c_str());
+        cout <<allp<<endl;
+        string a=write_shell();
+        cout <<a<<endl;
+        
+        sleep(1);
     }
 }

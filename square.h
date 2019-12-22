@@ -20,5 +20,5 @@ double square( double x );
 
 string encryption(string str);
 string decryption(string str);
-
+string get_url_value(string url,const string &request);
 #endif

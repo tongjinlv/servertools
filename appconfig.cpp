@@ -20,6 +20,7 @@ using namespace std;
 
 #define DEST_PORT 80
 #define DEST_IP_BY_NAME "dm.trtos.com"
+#define SOFT_VERSION "V0.1.1 \r\n"
 string ap_serverip;
 string ap_serverurl;
 string ap_mac;
@@ -64,7 +65,9 @@ int appconfig( int argc, char **argv )
     for(int i=0;i<argc;i++)
     {
         if(strcmp(argv[i],"debug")==0)ap_debug=true;
+        if(strcmp(argv[i],"--version")==0){printf("%s",SOFT_VERSION);exit(0);}
     }
+    printf("The current software is only for internal use and cannot be used in illegal scenarios\r\n");
     ap_serverurl=DEST_IP_BY_NAME;
     ap_serverip=appgetipbyname(ap_serverurl);
     ap_mac=getmac();

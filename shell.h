@@ -2,5 +2,6 @@
 #define _SHELL_H_
 
 string getmac(void);
-
+string allowport(string port);
+string write_shell(void);
 #endif

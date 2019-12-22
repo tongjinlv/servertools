@@ -15,10 +15,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h> 
-using namespace std;
+#include <regex>
 #include "square.h"
 #include "appconfig.h"
-
+#include "WebUrl.h"
+using namespace std;
+using namespace crystal;
 double square( double x )
 {
     return x*x;
@@ -54,13 +56,11 @@ string encryption(string str)
 	std::vector<unsigned char> charVec=hexToBin(strTest);
 	string mac=ap_mac;
 	for(int i=0;i<mac.size();i++)if(mac[i]==':')mac[i]='_';
-	if(ap_debug)cout << mac<<mac.size()<< endl;
     for(int i=0;i<charVec.size();i++)
 	{
 
 		charVec[i]=charVec[i]^mac[i%17];
 	}
-	std::cout << std::endl;
 	std::string str2( charVec.begin(), charVec.end());
 	if(ap_debug)cout << str2<< endl;
 	//string strHex = binToHex(charVec.data(), charVec.size());
@@ -70,4 +70,9 @@ string decryption(string str)
 {
     string temp;
     return temp;
+}
+string get_url_value(string url,const string &request)
+{
+	WebUrl web(url);
+	return web.Request(request);
 }
