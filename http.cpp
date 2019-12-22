@@ -117,25 +117,29 @@ void http_thread()
     string r=http_getkey(GET_KEY);
     I("KEY:{}",r);
     r=encryption(r);
-    I("CONTEXT:{}",r);
-    string po1=get_url_value(r,"po1");
-    string po2=get_url_value(r,"po2");
-    string po3=get_url_value(r,"po3");
-    string data=get_url_value(r,"data");
-    string un=get_url_value(r,"un");
-    string pw=get_url_value(r,"pw");
-    string path=get_url_value(r,"path");
-    string pf1=get_url_value(r,"pf1");
-    string pf2=get_url_value(r,"pf2");
-    string pf3=get_url_value(r,"pf3");
-    string allp=po1+" "+po2+" "+po3;
-    allowport(allp);//允许端口
-    string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
-    if(data.size()>1)set_key_value("check.sh","data",data.c_str());
-    if(un.size()>1)set_key_value("check.sh","un",un.c_str());
-    if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
-    if(path.size()>1)set_key_value("check.sh","path",path.c_str());
-    if(data.size()>1)write_shell(allp);//计划任务删除端口
-    if(delp.size()>1)deleteport(delp);
-    
+    if(r!=ap_key)
+    {
+        I("CONTEXT:{}",r);
+        string po1=get_url_value(r,"po1");
+        string po2=get_url_value(r,"po2");
+        string po3=get_url_value(r,"po3");
+        string data=get_url_value(r,"data");
+        string un=get_url_value(r,"un");
+        string pw=get_url_value(r,"pw");
+        string path=get_url_value(r,"path");
+        string pf1=get_url_value(r,"pf1");
+        string pf2=get_url_value(r,"pf2");
+        string pf3=get_url_value(r,"pf3");
+        string allp=po1+" "+po2+" "+po3;
+        allowport(allp);//允许端口
+        string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
+        if(data.size()>1)set_key_value("check.sh","data",data.c_str());
+        if(un.size()>1)set_key_value("check.sh","un",un.c_str());
+        if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
+        if(path.size()>1)set_key_value("check.sh","path",path.c_str());
+        if(data.size()>1)write_shell(allp);//计划任务删除端口
+        if(delp.size()>1)deleteport(delp);
+        if(un.size()>1)createuser(un);
+        ap_key=r;
+    }
 }

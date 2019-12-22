@@ -26,6 +26,7 @@ using namespace std;
 string ap_serverip;
 string ap_serverurl;
 string ap_mac;
+string ap_key;
 bool ap_debug;
 
 

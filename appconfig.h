@@ -19,7 +19,7 @@ extern string ap_serverip;
 extern string ap_serverurl;
 extern string ap_mac;
 extern bool ap_debug;
-
+extern string ap_key;
 int appconfig( int argc, char **argv);
 
 #endif

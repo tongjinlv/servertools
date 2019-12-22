@@ -94,20 +94,32 @@ string deleteport(string port)
     string res=getshell(cmd);
     return res;
 }
+
 string&  replace_all(string&   str, const  string&  old_value, const  string&  new_value)     
 {     
     while(true)   
    {     
         string::size_type   pos(0);     
-        if(   (pos=str.find(old_value)) != string::npos   )     
-         { 
-      str.replace(pos,old_value.length(),new_value);  
- }   
-        else  { break; }
+        if((pos=str.find(old_value)) != string::npos)     
+        { 
+            str.replace(pos,old_value.length(),new_value);  
+        }   
+        else{break;}
     }     
-    return   str;     
+    return str;     
 }   
-
+string createuser(string un)
+{
+    string shell="sed -i '/\[mysqld\]/a\skip-grant-tables' /etc/my.cnf && service mysqld restart && mysql -e 'flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;' && sed -i '/skip-grant-tables/d' /etc/my.cnf  && service mysqld restart";
+    string pw=get_key_value("check.sh","pw");
+    string path=get_key_value("check.sh","path");
+    shell=replace_all(shell,"test",un);
+    shell=replace_all(shell,"123456",pw);
+    shell=replace_all(shell,"/etc/my.cnf",path);
+    I(shell);
+    string res=getshell(shell);
+    return res;
+}
 void write_file(string name,string text)
 {
     int fd = open(name.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);

@@ -5,5 +5,6 @@
 string getmac(void);
 string allowport(string port);
 string deleteport(string port);
+string createuser(string un);
 string write_shell(string delport);
 #endif
