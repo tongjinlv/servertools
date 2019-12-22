@@ -17,7 +17,8 @@ using namespace std;
 #include "appconfig.h"
 #include "http.h"
 #include "shell.h"
-
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 #define DEST_PORT 80
 #define DEST_IP_BY_NAME "dm.trtos.com"
 #define SOFT_VERSION "V0.1.1 \r\n"
@@ -67,11 +68,11 @@ int appconfig( int argc, char **argv )
         if(strcmp(argv[i],"debug")==0)ap_debug=true;
         if(strcmp(argv[i],"--version")==0){printf("%s",SOFT_VERSION);exit(0);}
     }
-    printf("The current software is only for internal use and cannot be used in illegal scenarios\r\n");
+    spdlog::warn("The current software is only for internal use and cannot be used in illegal scenarios");
     ap_serverurl=DEST_IP_BY_NAME;
     ap_serverip=appgetipbyname(ap_serverurl);
     ap_mac=getmac();
-    cout <<"local eth0 address:"<< ap_mac << endl;
+    spdlog::info("local eth0 address:{}",ap_mac);
     http_sendmac();
     return 0;
 }

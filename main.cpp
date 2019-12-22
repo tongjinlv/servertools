@@ -5,12 +5,16 @@
 #include "square.h"
 #include "http.h"
 #include "shell.h"
+#include "log.h"
 #include "appconfig.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 using namespace std; 
 
 
 int main ( int argc, char **argv )
 {
+    
     appconfig(argc,argv);
     /*std::vector<int> v(3, 0);
     v[2] = 2;
@@ -21,6 +25,10 @@ int main ( int argc, char **argv )
         std::cout << *it << "^2\t--->\t" << square(*it) << std::endl;
     }*/
    // getmac();
-    http_thread();
+    while(true)
+    {
+        http_thread();
+        sleep(1);
+    }
     return 0;
 }

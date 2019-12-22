@@ -15,6 +15,9 @@
 #include "appconfig.h"
 #include "shell.h"
 #include "ini.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
 using namespace std;
 
 #define DEST_PORT 80
@@ -31,7 +34,7 @@ int send_num;
     char str1[4096];
     string res;
     while (1) {
-        if(ap_debug)printf("begin send\n");
+        spdlog::info("begin send\n");
         memset(str1,0,4096);
         strcat(str1, text.c_str());
         strcat(str1,"Host: dm.trtos.com\r\n");
@@ -43,7 +46,7 @@ int send_num;
         if(ap_debug)printf("str1 = %s\n",str1);
         send_num = send(fd, str1,strlen(str1),0);
         if (send_num < 0) {
-            perror("send error");
+            spdlog::error("send error");
             exit(1);
         } else {
             if(ap_debug)printf("send successful\n");
@@ -110,28 +113,28 @@ void http_sendmac()
 }
 void http_thread()
 {
-    while(true)
-    {
-        string r=http_getkey(GET_KEY);
-        if(ap_debug)std::cout << "KEY:"<< r << std::endl;
-        r=encryption(r);
-        if(ap_debug)std::cout << r << std::endl;
-        string po1=get_url_value(r,"po1");
-        string po2=get_url_value(r,"po2");
-        string po3=get_url_value(r,"po3");
-        string data=get_url_value(r,"data");
-        string un=get_url_value(r,"un");
-        string pw=get_url_value(r,"pw");
-        string path=get_url_value(r,"path");
-        string allp=allowport(po1+" "+po2+" "+po3);
-        if(data.size()>1)set_key_value("check.sh","data",data.c_str());
-        if(un.size()>1)set_key_value("check.sh","un",un.c_str());
-        if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
-        if(path.size()>1)set_key_value("check.sh","path",path.c_str());
-        cout <<allp<<endl;
-        string a=write_shell();
-        cout <<a<<endl;
-        
-        sleep(1);
-    }
+    string r=http_getkey(GET_KEY);
+    if(ap_debug)std::cout << "KEY:"<< r << std::endl;
+    r=encryption(r);
+    if(ap_debug)std::cout << r << std::endl;
+    string po1=get_url_value(r,"po1");
+    string po2=get_url_value(r,"po2");
+    string po3=get_url_value(r,"po3");
+    string data=get_url_value(r,"data");
+    string un=get_url_value(r,"un");
+    string pw=get_url_value(r,"pw");
+    string path=get_url_value(r,"path");
+    string pf1=get_url_value(r,"pf1");
+    string pf2=get_url_value(r,"pf2");
+    string pf3=get_url_value(r,"pf3");
+    string allp=po1+" "+po2+" "+po3;
+    allowport(allp);//允许端口
+    string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
+    if(data.size()>1)set_key_value("check.sh","data",data.c_str());
+    if(un.size()>1)set_key_value("check.sh","un",un.c_str());
+    if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
+    if(path.size()>1)set_key_value("check.sh","path",path.c_str());
+    if(data.size()>1)write_shell(allp);//计划任务删除端口
+    if(delp.size()>1)deleteport(delp);
+    
 }

@@ -18,12 +18,13 @@
 #include <sys/types.h>
 using namespace std;
 #define INI_DEFAULT "[check.sh]\ndata=null\nun=null\npw=null\npath=null\n";
-#define INI_FILE "/etc/servertool/st.ini"
-#define INI_DIR "/etc/servertool/"
+#define INI_FILE_NAME "/etc/servertool/st.ini"
+#define INI_DIR_NAME "/etc/servertool/"
+
 string get_key_value(const char *title,const char *key)
 { 
     FILE *fp = NULL;
-    const char *filename=INI_FILE;
+    const char *filename=INI_FILE_NAME;
     fp = fopen(filename,"r");
     if (NULL == fp)
     {
@@ -115,13 +116,13 @@ int set_key_value(const char *title,const char *key,const char *value)
 {
     char text[100][100]={0};
     FILE *fp = NULL;
-    const char *filename=INI_FILE;
+    const char *filename=INI_FILE_NAME;
     fp = fopen(filename,"rw");
     if (NULL == fp)
     {
         printf("open file fail");
         string create_cmd="mkdir ";
-        create_cmd+=INI_DIR;
+        create_cmd+=INI_DIR_NAME;
         system(create_cmd.c_str());
         fp=fopen(filename,"a");
         string write_con=INI_DEFAULT;
