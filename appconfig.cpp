@@ -48,7 +48,7 @@ string appgetipbyname(string name)
     if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)E("ERROR: getaddrinfo error: {}\n", gai_strerror(err));
     for(aip = ai; aip != NULL; aip = aip->ai_next)
     {
-        E("Canonical Name: {}\n", aip->ai_canonname);
+        I("Canonical Name: {}\n", aip->ai_canonname);
         if(aip->ai_family == AF_INET)
         {
             sinp = (struct sockaddr_in *)aip->ai_addr;
