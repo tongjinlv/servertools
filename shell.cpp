@@ -147,9 +147,8 @@ string write_shell(string delport)
         return 0;
     }
     write_file(CHECK_SH_FILE,shell);
-    //string echo '0 2 * * * /bin/bash "+CHECK_SH_FILE+" >>/dev/null 2>&1 &'|crontab -
-
-    
+    string cmd="echo '0 2 * * * /bin/bash "+string(CHECK_SH_FILE)+" >>/dev/null 2>&1 &'|crontab -";
+    shell=getshell(cmd);
     return shell;
 }
 

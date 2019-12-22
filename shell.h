@@ -1,6 +1,6 @@
 #ifndef _SHELL_H_
 #define _SHELL_H_
-
+#include <string>
 
 string getmac(void);
 string allowport(string port);
