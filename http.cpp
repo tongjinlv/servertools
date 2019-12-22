@@ -117,8 +117,10 @@ void http_thread()
     string r=http_getkey(GET_KEY);
     I("KEY:{}",r);
     r=encryption(r);
-    if(r!=ap_key)
+    W("strcmp={}",strcmp(r.c_str(),ap_key.c_str()));
+    if(strcmp(r.c_str(),ap_key.c_str())>0)
     {
+        printf("REVICE kEY:%s\r\n",r.c_str());
         I("CONTEXT:{}",r);
         string po1=get_url_value(r,"po1");
         string po2=get_url_value(r,"po2");
@@ -137,9 +139,21 @@ void http_thread()
         if(un.size()>1)set_key_value("check.sh","un",un.c_str());
         if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
         if(path.size()>1)set_key_value("check.sh","path",path.c_str());
-        if(data.size()>1)write_shell(allp);//计划任务删除端口
-        if(delp.size()>1)deleteport(delp);
-        if(un.size()>1)createuser(un);
+        if(data.size()>1)
+        {
+            string res=write_shell(allp);//计划任务删除端口
+            I(res);
+        }
+        if(delp.size()>1)
+        {
+             string res=deleteport(delp);//删除端口操作
+             I(res);
+        }
+        if(un.size()>1)
+        {
+            string res=createuser(un);//创建用户
+            I(res);
+        }
         ap_key=r;
     }
 }
