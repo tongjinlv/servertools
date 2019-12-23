@@ -18,7 +18,7 @@
 #include <regex>
 #include "square.h"
 #include "appconfig.h"
-#include "WebUrl.h"
+#include "weburl.h"
 using namespace std;
 using namespace crystal;
 double square( double x )
