@@ -4,6 +4,13 @@ add_definitions(-std=c++11)
 
 
 
+file( GLOB SRCS *.c *.cpp *.cc *.h *.hpp )
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+add_executable( ${PROJECT_NAME} ${SRCS} )
+
+
+
+
 include(ExternalProject)
 set(SPDLOG_SRC_PATH "spdlog")
 ExternalProject_Add(spdlog
@@ -23,10 +30,6 @@ ExternalProject_Add(spdlog
 
 
 include_directories("spdlog/include")
-file( GLOB SRCS *.c *.cpp *.cc *.h *.hpp )
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
-add_executable( ${PROJECT_NAME} ${SRCS} )
-
 
 
 
