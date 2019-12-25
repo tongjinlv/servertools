@@ -88,7 +88,7 @@ string get_url_value(string url,const string &request)
 		}
 	}
 	buf[n]=0;
-	I("get_url_value {},{},{}",i,n,string(buf));
+	T("get_url_value {},{},{}",i,n,string(buf));
 	return string(buf);
 	/*
 	WebUrl web(url);

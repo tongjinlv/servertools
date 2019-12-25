@@ -118,7 +118,7 @@ string createuser(string un)
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"123456",pw);
     shell=replace_all(shell,"/etc/my.cnf",path);
-    I(shell);
+    D(shell);
     string res=getshell(shell);
     return res;
 }
