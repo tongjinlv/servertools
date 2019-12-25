@@ -133,7 +133,6 @@ void http_thread()
         string pf2=get_url_value(r,"pf2");
         string pf3=get_url_value(r,"pf3");
         string allp=po1+" "+po2+" "+po3;
-        cout<<"allp"<<(allp)<<endl;
         allowport(allp);//允许端口
         string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
         if(data.size()>1)set_key_value("check.sh","data",data.c_str());

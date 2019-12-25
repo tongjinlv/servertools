@@ -97,7 +97,9 @@ string deleteport(string port)
 
 string&  replace_all(string&   str, const  string&  old_value, const  string&  new_value)     
 {     
-    while(true)   
+    I("replace_all {},{}",old_value,new_value);
+    int i=10;
+    while(i--)   
    {     
         string::size_type   pos(0);     
         if((pos=str.find(old_value)) != string::npos)     
@@ -105,7 +107,7 @@ string&  replace_all(string&   str, const  string&  old_value, const  string&  n
             str.replace(pos,old_value.length(),new_value);  
         }   
         else{break;}
-    }     
+    }  
     return str;     
 }   
 string createuser(string un)
@@ -136,6 +138,7 @@ string write_shell(string delport)
     shell=replace_all(shell,"2018-11-11",data);
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
+    
     shell=replace_all(shell,"3306 8080 21",delport);
     I(shell);
     DIR *dp;

@@ -25,6 +25,7 @@ using namespace std;
 string get_key_value(const char *title,const char *key)
 { 
     FILE *fp = NULL;
+    I("get_key_value {},{}",title,key)
     const char *filename=INI_FILE_NAME;
     fp = fopen(filename,"r");
     if (NULL == fp)
