@@ -19,7 +19,7 @@ int main ( int argc, char **argv )
     while(true)
     {
         http_thread();
-        sleep(1);
+        sleep(3);
     }
     return 0;
 }

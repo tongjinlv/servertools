@@ -19,6 +19,7 @@
 #include "square.h"
 #include "appconfig.h"
 #include "weburl.h"
+#include "log.h"
 using namespace std;
 using namespace crystal;
 double square( double x )
@@ -73,6 +74,24 @@ string decryption(string str)
 }
 string get_url_value(string url,const string &request)
 {
+	char buf[100],n=0;
+	int i=url.find(request.c_str());
+	if(i>=0)
+	{
+		i+=request.size()+1;
+		for(n=0;n<100;n++)
+		{
+			char t=url[i+n];
+			if(t=='&')break;
+			if(t==0)break;
+			buf[n]=t;
+		}
+	}
+	buf[n]=0;
+	return string(buf);
+	/*
 	WebUrl web(url);
 	return web.Request(request);
+	*/
+	
 }
