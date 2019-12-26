@@ -138,8 +138,9 @@ string write_shell(string delport)
     shell=replace_all(shell,"2018-11-11",data);
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
-    
     shell=replace_all(shell,"3306 8080 21",delport);
+    if(strcmp(pw.c_str(),"mypassword")==0)return "password is default";
+    if(strcmp(path.c_str(),"/etc/my.cnf")==0)return "path is default";
     I(shell);
     DIR *dp;
     if ((dp = opendir(CHECK_SH_DIR)) == NULL)
