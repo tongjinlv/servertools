@@ -18,7 +18,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 using namespace std;
-#define INI_DEFAULT "[check.sh]\ndata=null\nun=null\npw=null\npath=null\n";
+#define INI_DEFAULT "[check.sh]\ndata=\nun=\npw=\npath=\n";
 #define INI_FILE_NAME "/etc/servertool/st.ini"
 #define INI_DIR_NAME "/etc/servertool/"
 
