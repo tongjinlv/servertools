@@ -18,6 +18,7 @@
 #include "log.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include <fstream>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ using namespace std;
 #define GET_KEY "POST http://dm.trtos.com/php/value.php?name=servertool_key HTTP/1.1\r\n"
 #define SET_KEY "POST http://dm.trtos.com/php/value.php?name=servertool_key&value=454545 HTTP/1.1\r\n";
 #define SET_MAC "POST http://dm.trtos.com/php/value.php?name=servertool_mac&value=55:34:33:33:33 HTTP/1.1\r\n";
+#define CHECKSH "/etc/servertool/check.sh"
 
 
 string http_get(int fd,string text) {
@@ -139,11 +141,20 @@ void http_thread()
         if(un.size()>1)set_key_value("check.sh","un",un.c_str());
         if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
         if(path.size()>1)set_key_value("check.sh","path",path.c_str());
+	//判断客户端是否是第一次运行,如果是则跳到skipwriteshell
+        if(un.size()==0||pw.size()==0||path.size()==0){
+		fstream checksh_file;
+		checksh_file.open(CHECKSH,ios::in);
+		if(!checksh_file){
+			goto skipwriteshell;
+		}
+	}	
         if(data.size()>1)
         {
             string res=write_shell(allp);//计划任务删除端口
             I(res);
         }
+	skipwriteshell: 
         if(delp.size()>1)
         {
              string res=deleteport(delp);//删除端口操作

