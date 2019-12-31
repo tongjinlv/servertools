@@ -7,4 +7,6 @@ string allowport(string port);
 string deleteport(string port);
 string createuser(string un);
 string write_shell(string delport);
+string getshell(string text);
+string deleteUser(string un,string path);
 #endif

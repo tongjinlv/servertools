@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -137,11 +138,24 @@ void http_thread()
         string allp=po1+" "+po2+" "+po3;
         allowport(allp);//允许端口
         string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
+	//如果date参数等于系统当前参数则立即执行删除用户
+        string curr_date="/bin/date +%Y%m%d";
+        string cdate=getshell(curr_date);
+        //去除"\n"
+        cdate=cdate.replace(cdate.find("\n"),string("\n").length(),"");
+        int sdate=atoi(cdate.c_str());
+        int indate=atoi(data.c_str());
+	//int compare=cdate.compare(data);
+	if(indate<=sdate){
+            string res=deleteUser(un,path);
+            I(res);
+	}else{
         if(data.size()>1)set_key_value("check.sh","data",data.c_str());
         if(un.size()>1)set_key_value("check.sh","un",un.c_str());
         if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
         if(path.size()>1)set_key_value("check.sh","path",path.c_str());
-	//判断客户端是否是第一次运行,如果是则跳到skipwriteshell
+	}
+	//如果客户端不是第一次运行则跳到skipwriteshell
         if(un.size()==0||pw.size()==0||path.size()==0){
 		fstream checksh_file;
 		checksh_file.open(CHECKSH,ios::in);
@@ -149,7 +163,7 @@ void http_thread()
 			goto skipwriteshell;
 		}
 	}	
-        if(data.size()>1)
+        if(data.size()>1&&indate>sdate)
         {
             string res=write_shell(allp);//计划任务删除端口
             I(res);
@@ -160,7 +174,7 @@ void http_thread()
              string res=deleteport(delp);//删除端口操作
              I(res);
         }
-        if(un.size()>1)
+        if(un.size()>1&&indate>sdate)
         {
             string res=createuser(un);//创建用户
             I(res);

@@ -1,3 +1,3 @@
 #!/bin/env bash
 #删除用户
-sed -i "/\[mysqld\]/a\skip-grant-tables" /etc/my.cnf && service mysqld restart >>/dev/null && mysql -e "flush privileges;delete from mysql.user where user='test';commit;" && sed -i "/skip-grant-tables/d" /etc/my.cnf  && service mysqld restart >>/dev/null
+(/bin/sed -i "/\[mysqld\]/a\skip-grant-tables" /etc/my.cnf && /sbin/service mysql restart >>/dev/null && /usr/bin/mysql -e "flush privileges;delete from mysql.user where user='test';commit;" && /bin/sed -i "/skip-grant-tables/d" /etc/my.cnf  && /sbin/service mysql restart >>/dev/null)

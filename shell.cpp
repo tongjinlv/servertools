@@ -81,7 +81,7 @@ string getmac(void)
 }
 string allowport(string port)
 {
-    string cmd="allowPortList='"+port+"';for port in $allowPortList;do /sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT;done";
+    string cmd="allowPortList='"+port+"';for port in $allowPortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j DROP;/sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;done";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;
@@ -89,7 +89,7 @@ string allowport(string port)
 
 string deleteport(string port)
 {
-    string cmd="deletePortList='"+port+"';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT;done";
+    string cmd="deletePortList='"+port+"';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1;done";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;
@@ -112,7 +112,7 @@ string&  replace_all(string&   str, const  string&  old_value, const  string&  n
 }   
 string createuser(string un)
 {
-    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysql restart >>/dev/null && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysql restart >>/dev/null)";
+    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysqld restart >>/dev/null && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysqld restart >>/dev/null)";
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
     shell=replace_all(shell,"test",un);
@@ -134,7 +134,7 @@ string write_shell(string delport)
     string un=get_key_value("check.sh","un");
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
-    string shell="(inDATE='99999999' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;done) && /bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysql restart >>/dev/null && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysql restart >>/dev/null)";
+    string shell="(inDATE='99999999' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1;done);/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysqld restart >>/dev/null && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysqld restart >>/dev/null)";
     shell=replace_all(shell,"99999999",data);
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
@@ -154,3 +154,11 @@ string write_shell(string delport)
     return shell;
 }
 
+string deleteUser(string un,string path)
+{
+    string Dcmd="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysqld restart >>/dev/null && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysqld restart >>/dev/null)";
+    Dcmd=replace_all(Dcmd,"test",un);
+    Dcmd=replace_all(Dcmd,"/etc/my.cnf",path);
+    string result=getshell(Dcmd);
+    return result;
+}
