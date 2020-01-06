@@ -30,35 +30,6 @@ string ap_key;
 bool ap_debug;
 
 
-string appgetipbyname(string name)
-{
-    struct addrinfo *ai, *aip;
-    struct addrinfo hint;
-    struct sockaddr_in *sinp;
-    const char *addr;
-    int err;
-    char buf[1024];
-    hint.ai_flags = AI_CANONNAME;
-    hint.ai_family = 0;
-    hint.ai_socktype = 0;
-    hint.ai_protocol = 0;
-    hint.ai_addrlen = 0;
-    hint.ai_canonname = NULL;
-    hint.ai_addr = NULL;
-    hint.ai_next = NULL;
-    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)E("ERROR: getaddrinfo error: {}\n", gai_strerror(err));
-    for(aip = ai; aip != NULL; aip = aip->ai_next)
-    {
-        I("Canonical Name: {}\n", aip->ai_canonname);
-        if(aip->ai_family == AF_INET)
-        {
-            sinp = (struct sockaddr_in *)aip->ai_addr;
-            addr = inet_ntop(AF_INET, &sinp->sin_addr, buf, sizeof buf);
-            return addr;
-        }
-    }
-    return 0;
-}
 
 //配置参数
 int appconfig( int argc, char **argv )
@@ -73,9 +44,5 @@ int appconfig( int argc, char **argv )
     }
     W("The current software is only for internal use and cannot be used in illegal scenarios");
     ap_serverurl=DEST_IP_BY_NAME;
-    ap_serverip=appgetipbyname(ap_serverurl);
-    ap_mac=getmac();
-    I("local eth0 address:{}",ap_mac);
-    http_sendmac();
     return 0;
 }

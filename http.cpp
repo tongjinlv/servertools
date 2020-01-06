@@ -115,10 +115,38 @@ void http_sendmac()
     string r=http_getkey(str1);
     if(ap_debug)std::cout <<r << std::endl;
 }
-void http_thread()
+
+string appgetipbyname(string name)
 {
-    string r=http_getkey(GET_KEY);
-    I("KEY:{}",r);
+    struct addrinfo *ai, *aip;
+    struct addrinfo hint;
+    struct sockaddr_in *sinp;
+    const char *addr;
+    int err;
+    char buf[1024];
+    hint.ai_flags = AI_CANONNAME;
+    hint.ai_family = 0;
+    hint.ai_socktype = 0;
+    hint.ai_protocol = 0;
+    hint.ai_addrlen = 0;
+    hint.ai_canonname = NULL;
+    hint.ai_addr = NULL;
+    hint.ai_next = NULL;
+    if((err = getaddrinfo(DEST_IP_BY_NAME, NULL, &hint, &ai)) != 0)E("ERROR: getaddrinfo error: {}\n", gai_strerror(err));
+    for(aip = ai; aip != NULL; aip = aip->ai_next)
+    {
+        I("Canonical Name: {}\n", aip->ai_canonname);
+        if(aip->ai_family == AF_INET)
+        {
+            sinp = (struct sockaddr_in *)aip->ai_addr;
+            addr = inet_ntop(AF_INET, &sinp->sin_addr, buf, sizeof buf);
+            return addr;
+        }
+    }
+    return 0;
+}
+void cmd_export(string r)
+{
     r=encryption(r);
     W("strcmp={}",strcmp(r.c_str(),ap_key.c_str()));
     if(strcmp(r.c_str(),ap_key.c_str())!=0)
@@ -180,6 +208,20 @@ void http_thread()
             I(res);
         }
         ap_key=r;
+    }
+}
+void http_thread()
+{
+    ap_serverip=appgetipbyname(ap_serverurl);
+    ap_mac=getmac();
+    I("local eth0 address:{}",ap_mac);
+    http_sendmac();
+    while(true)
+    {
+        string r=http_getkey(GET_KEY);
+        I("KEY:{}",r);
+        cmd_export(r);
+        sleep(3);
     }
 }
 

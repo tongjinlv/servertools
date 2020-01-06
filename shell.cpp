@@ -73,10 +73,25 @@ string getshell(string text)
     r=cmd;
     return r;
 }
-
+string&  replace_all(string&   str, const  string&  old_value, const  string&  new_value)     
+{     
+    I("replace_all {},{}",old_value,new_value);
+    int i=10;
+    while(i--)   
+   {     
+        string::size_type   pos(0);     
+        if((pos=str.find(old_value)) != string::npos)     
+        { 
+            str.replace(pos,old_value.length(),new_value);  
+        }   
+        else{break;}
+    }  
+    return str;     
+}   
 string getmac(void)
 {
     string res=getshell(GET_HOST_MAC);
+    res=replace_all(res,"\n","");
     return res;
 }
 string allowport(string port)
@@ -95,21 +110,7 @@ string deleteport(string port)
     return res;
 }
 
-string&  replace_all(string&   str, const  string&  old_value, const  string&  new_value)     
-{     
-    I("replace_all {},{}",old_value,new_value);
-    int i=10;
-    while(i--)   
-   {     
-        string::size_type   pos(0);     
-        if((pos=str.find(old_value)) != string::npos)     
-        { 
-            str.replace(pos,old_value.length(),new_value);  
-        }   
-        else{break;}
-    }  
-    return str;     
-}   
+
 string createuser(string un)
 {
     string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && /sbin/service mysql restart >>/dev/null && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && /sbin/service mysql restart >>/dev/null)";

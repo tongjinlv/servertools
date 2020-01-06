@@ -2,7 +2,9 @@
 #include <iostream>  
 #include <sys/socket.h>  
 #include <arpa/inet.h>  
-  
+
+using namespace std;
+
 #define MAXSIZE 1024  
   
 class tcp_server  
@@ -15,4 +17,5 @@ private:
 public:  
         tcp_server(int listen_port);  
         int recv_msg();  
+        string task(string msg);
 }; 
