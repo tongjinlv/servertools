@@ -50,7 +50,7 @@ std::vector<unsigned char> hexToBin(const std::string hex)
 	}
 	return dest;
 }
-string encryption(string str)
+string decryption(string str)
 {
     string temp;
     const char *strTest =str.c_str();
@@ -67,7 +67,7 @@ string encryption(string str)
 	//string strHex = binToHex(charVec.data(), charVec.size());
     return str2;
 } 
-string decryption(string str)
+string encryption(string str)
 {
     string temp;
     return temp;

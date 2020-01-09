@@ -8,6 +8,7 @@
 #include "log.h"
 #include "shell.h"
 #include "http.h"
+#include "appconfig.h"
 using namespace std;
 
 tcp_server::tcp_server(int listen_port) {
@@ -33,6 +34,8 @@ string tcp_server::task(string msg)
         if(strcmp(msg.c_str(),"getmac")==0)return getmac();
         if(strcmp(msg.c_str(),"key:")>0)
         {
+                ap_mac=getmac();
+                I("local eth0 address:{}",ap_mac);
                 msg=msg.erase(0, 4);
                 I("Revice={}",msg);
                 cmd_export(msg);

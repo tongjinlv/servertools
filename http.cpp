@@ -147,7 +147,9 @@ string appgetipbyname(string name)
 }
 void cmd_export(string r)
 {
-    r=encryption(r);
+    I("cmd_export={}",r.c_str());
+    r=decryption(r);
+    I("cmd_export={}",r.c_str());
     W("strcmp={}",strcmp(r.c_str(),ap_key.c_str()));
     if(strcmp(r.c_str(),ap_key.c_str())!=0)
     {
