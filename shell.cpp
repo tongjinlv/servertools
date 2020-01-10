@@ -96,7 +96,7 @@ string getmac(void)
 }
 string allowport(string port)
 {
-    string cmd="allowPortList='"+port+"';for port in $allowPortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j DROP;/sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;done";
+    string cmd="allowPortList='"+port+"';for port in $allowPortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j DROP);(/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);done";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;
@@ -104,7 +104,7 @@ string allowport(string port)
 
 string deleteport(string port)
 {
-    string cmd="deletePortList='"+port+"';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1;done";
+    string cmd="deletePortList='"+port+"';for port in $deletePortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -D INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);done";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;

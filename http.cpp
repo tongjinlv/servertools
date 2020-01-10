@@ -165,50 +165,59 @@ void cmd_export(string r)
         string pf1=get_url_value(r,"pf1");
         string pf2=get_url_value(r,"pf2");
         string pf3=get_url_value(r,"pf3");
-        string allp=po1+" "+po2+" "+po3;
-        allowport(allp);//允许端口
+        string allp=po1+" "+po2+" "+po3;//这次允许的端口
         string delp=pf1+" "+pf2+" "+pf3;//这次关闭的端口
-	//如果date参数等于系统当前参数则立即执行删除用户
         string curr_date="/bin/date +%Y%m%d";
         string cdate=getshell(curr_date);
         //去除"\n"
         cdate=cdate.replace(cdate.find("\n"),string("\n").length(),"");
         int sdate=atoi(cdate.c_str());
         int indate=atoi(data.c_str());
-	//int compare=cdate.compare(data);
-	if(indate<=sdate){
+		//如果date参数等于系统当前参数则立即执行删除用户
+		if(indate<=sdate){
             string res=deleteUser(un,path);
             I(res);
-	}else{
-        if(data.size()>1)set_key_value("check.sh","data",data.c_str());
-        if(un.size()>1)set_key_value("check.sh","un",un.c_str());
-        if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
-        if(path.size()>1)set_key_value("check.sh","path",path.c_str());
-	}
-	//如果客户端不是第一次运行则跳到skipwriteshell
-        if(un.size()==0||pw.size()==0||path.size()==0){
-		fstream checksh_file;
-		checksh_file.open(CHECKSH,ios::in);
-		if(!checksh_file){
-			goto skipwriteshell;
+            res=deleteport(allp);//删除端口操作
+            I(res);
+            res=deleteport(delp);//删除端口操作
+            I(res);
+		}else{
+        	if(data.size()>1)set_key_value("check.sh","data",data.c_str());
+        	if(un.size()>1)set_key_value("check.sh","un",un.c_str());
+        	if(pw.size()>1)set_key_value("check.sh","pw",pw.c_str());
+        	if(path.size()>1)set_key_value("check.sh","path",path.c_str());
+			//如果客户端不是第一次运行则跳到skipwriteshell
+        	if(un.size()==0||pw.size()==0||path.size()==0)
+			{
+			fstream checksh_file;
+			checksh_file.open(CHECKSH,ios::in);
+				if(!checksh_file)
+				{
+					goto skipwriteshell;
+				}
+			}	
+        	if(data.size()>1&&indate>sdate)
+        	{
+            	string res=write_shell(allp);//计划任务删除端口
+            I(res);
+        	}
+			skipwriteshell: 
+        	if(allp.size()>1)
+        	{
+            	string res=allowport(allp);//允许端口操作
+             	I(res);
+        	}
+        	if(delp.size()>1)
+        	{
+            	string res=deleteport(delp);//删除端口操作
+             	I(res);
+        	}
+        	if(un.size()>1&&indate>sdate)
+        	{
+            	string res=createuser(un);//创建用户
+            	I(res);
+        	}
 		}
-	}	
-        if(data.size()>1&&indate>sdate)
-        {
-            string res=write_shell(allp);//计划任务删除端口
-            I(res);
-        }
-	skipwriteshell: 
-        if(delp.size()>1)
-        {
-             string res=deleteport(delp);//删除端口操作
-             I(res);
-        }
-        if(un.size()>1&&indate>sdate)
-        {
-            string res=createuser(un);//创建用户
-            I(res);
-        }
         ap_key=r;
     }
 }
