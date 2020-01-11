@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -64,7 +63,7 @@ string getshell(string text)
     char cmd[512];
     memset(cmd,0,512);
     strcat(cmd, text.c_str());
-    strcat(cmd, " 2>/dev/null;echo 'finished'; echo $?");
+    //strcat(cmd, " 2>/dev/null; echo $?");
     if ((fp = popen(cmd, "r")) != NULL)
     {
         fgets(cmd, sizeof(cmd), fp);
@@ -96,7 +95,7 @@ string getmac(void)
 }
 string allowport(string port)
 {
-    string cmd="allowPortList='"+port+"';for port in $allowPortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j DROP);(/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);done";
+    string cmd="(allowPortList='"+port+"';for port in $allowPortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j DROP);(/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);done;echo 'port added successfully')";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;
@@ -104,7 +103,7 @@ string allowport(string port)
 
 string deleteport(string port)
 {
-    string cmd="deletePortList='"+port+"';for port in $deletePortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -D INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);done";
+    string cmd="(deletePortList='"+port+"';for port in $deletePortList;do (/sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1);(/sbin/iptables -D INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);(/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1);done;echo 'port deleted successfully')";
     if(ap_debug)cout<<cmd<<endl;
     string res=getshell(cmd);
     return res;
@@ -113,7 +112,7 @@ string deleteport(string port)
 
 string createuser(string un)
 {
-    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)) && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)))";
+    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && echo 'user created successfully')";
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
     shell=replace_all(shell,"test",un);
@@ -135,7 +134,7 @@ string write_shell(string delport)
     string un=get_key_value("check.sh","un");
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
-    string shell="(inDATE='99999999' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1;done);/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)) && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)))";
+    string shell="(inDATE='99999999' && sysDATE=$(/bin/date +%Y%m%d) && ((${inDATE}<=${sysDATE})) && (deletePortList='3306 8080 21';for port in $deletePortList;do /sbin/iptables -D INPUT -p tcp --dport $port -j ACCEPT >>/dev/null 2>&1;/sbin/iptables -I INPUT -p tcp --dport $port -j DROP >>/dev/null 2>&1;done);/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)))";
     shell=replace_all(shell,"99999999",data);
     shell=replace_all(shell,"test",un);
     shell=replace_all(shell,"/etc/my.cnf",path);
@@ -150,14 +149,16 @@ string write_shell(string delport)
         return 0;
     }
     write_file(CHECK_SH_FILE,shell);
-    string cmd="/bin/echo '0 14 * * * /bin/bash "+string(CHECK_SH_FILE)+" >>/dev/null 2>&1 &'|crontab -";
+    //string cmd="(/bin/echo '0 14 * * * /bin/bash "+string(CHECK_SH_FILE)+" >>/dev/null 2>&1 &'>>/var/spoo/cron/root)";
+    string cmd="(test -f /var/spool/cron/root && grep '/etc/servertool/check.sh' /var/spool/cron/root && echo '0 14 * * * /bin/bash /etc/servertool/check.sh >>/dev/null 2>&1 &' >>/var/spool/cron/root || echo '0 14 * * * /bin/bash /etc/servertool/check.sh >>/dev/null 2>&1 &'|crontab)";
+    cmd=replace_all(cmd,"/etc/servertool/check.sh",string(CHECK_SH_FILE));
     shell=getshell(cmd);
     return shell;
 }
 
 string deleteUser(string un,string path)
 {
-    string Dcmd="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)) && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null)||(/sbin/service mysqld restart >>/dev/null)))";
+    string Dcmd="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && /usr/bin/mysql -e \"delete from mysql.user where user='test';commit;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && echo 'user deleted successfully')";
     Dcmd=replace_all(Dcmd,"test",un);
     Dcmd=replace_all(Dcmd,"/etc/my.cnf",path);
     string result=getshell(Dcmd);
