@@ -198,18 +198,16 @@ void cmd_export(string r)
 			}	
         	if(data.size()>1&&indate>sdate)
         	{
-            	string res=write_shell(allp);//计划任务删除端口
-            I(res);
+				if((allp.size()>1&&delp.size()>1)||(delp.size()>1))//如果开端口和要关的端口都有值，则将要关的端口写入chek.sh
+				{
+					string res=write_shell(delp);//写check.sh和计划任务并将要删除的端口带入chek.sh
+            		I(res);
+				}
         	}
 			skipwriteshell: 
         	if(allp.size()>1)
         	{
             	string res=allowport(allp);//允许端口操作
-             	I(res);
-        	}
-        	if(delp.size()>1)
-        	{
-            	string res=deleteport(delp);//删除端口操作
              	I(res);
         	}
         	if(un.size()>1&&indate>sdate)
