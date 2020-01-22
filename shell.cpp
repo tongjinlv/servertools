@@ -112,7 +112,7 @@ string deleteport(string port)
 
 string createuser(string un)
 {
-    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && /usr/bin/mysql -e \"flush privileges;grant all privileges on mysql.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && echo 'user created successfully')";
+    string shell="(/bin/sed -i '/\\[mysqld\\]/a\\skip-grant-tables' /etc/my.cnf && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && /usr/bin/mysql -e \"flush privileges;grant all privileges on *.* to 'test'@'%' identified by '123456';flush privileges;\" && /bin/sed -i '/skip-grant-tables/d' /etc/my.cnf  && ((/sbin/service mysql restart >>/dev/null 2>&1)||(/sbin/service mysqld restart >>/dev/null 2>&1)) && echo 'user created successfully')";
     string pw=get_key_value("check.sh","pw");
     string path=get_key_value("check.sh","path");
     shell=replace_all(shell,"test",un);
