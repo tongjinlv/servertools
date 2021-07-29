@@ -42,7 +42,6 @@ int appconfig( int argc, char **argv )
         
         if(strcmp(argv[i],"--version")==0){printf("%s",SOFT_VERSION);exit(0);}
     }
-    W("The current software is only for internal use and cannot be used in illegal scenarios");
     ap_serverurl=DEST_IP_BY_NAME;
     return 0;
 }

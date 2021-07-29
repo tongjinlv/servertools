@@ -21,4 +21,6 @@ double square( double x );
 string encryption(string str);
 string decryption(string str);
 string get_url_value(string url,const string &request);
+vector<string> split_c(const string &s, const string &seperator);
+vector<string> split_c(const char *ss, const string &seperator);
 #endif
