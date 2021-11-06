@@ -6,11 +6,12 @@ add_definitions(-std=c++11)
 
 
 
-file( GLOB SRCS *.c *.cpp *.cc *.h *.hpp )
+file( GLOB SRCS *.c *.cpp *.cc *.h *.hpp src/*)
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 set(CMAKE_CXX_FLAGS "${CAMKE_CXX_FLAGS} -std=c++11 -pthread")
 add_executable( ${PROJECT_NAME} ${SRCS} )
 include_directories("spdlog/include")
+include_directories("dlib")
 
 
 
